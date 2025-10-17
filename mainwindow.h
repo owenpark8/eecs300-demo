@@ -17,8 +17,6 @@ public:
     ~MainWindow() override;
 
 public slots:
-    void incrementCounter();
-    void decrementCounter();
     void setCounter(std::size_t value);
     void resetCounter();
 

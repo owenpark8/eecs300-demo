@@ -77,40 +77,12 @@ MainWindow::MainWindow() {
     clearAct->setStatusTip(tr("Clear counter"));
     fileToolbar->addAction(clearAct);
     connect(clearAct, &QAction::triggered, this, [this]() { resetCounter(); });
-
-    auto const addIcon = QIcon::fromTheme("list-add", QIcon("./images/add.png"));
-    auto* addAct = new QAction(addIcon, tr("&Add"), this);
-    addAct->setShortcut(QKeySequence(Qt::Key_Up));
-    addAct->setStatusTip(tr("Add to counter"));
-    fileToolbar->addAction(addAct);
-    connect(addAct, &QAction::triggered, this, &MainWindow::incrementCounter);
-
-    auto const removeIcon = QIcon::fromTheme("list-remove", QIcon("./images/remove.png"));
-    auto* removeAct = new QAction(removeIcon, tr("&Remove"), this);
-    removeAct->setShortcut(QKeySequence(Qt::Key_Down));
-    removeAct->setStatusTip(tr("Remove from counter"));
-    fileToolbar->addAction(removeAct);
-    connect(removeAct, &QAction::triggered, this, &MainWindow::decrementCounter);
 }
 
 MainWindow::~MainWindow() {
     delete mSettings;
     delete mCounterLabel;
     delete mSerial;
-}
-
-void MainWindow::incrementCounter() {
-    mCounterValue++;
-    mCounterLabel->setText(QString::number(mCounterValue));
-    mDeltaLabel->setText("+1");
-}
-
-void MainWindow::decrementCounter() {
-    if (mCounterValue > 0) {
-        mCounterValue--;
-        mCounterLabel->setText(QString::number(mCounterValue));
-        mDeltaLabel->setText("-1");
-    }
 }
 
 void MainWindow::setCounter(std::size_t value) {
