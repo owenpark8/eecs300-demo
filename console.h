@@ -17,8 +17,6 @@ public slots:
     void printLine(QString const& line);
 
 private:
-    void printTimestampIfEnabled();
-
-private:
     bool mIsTimestampEnabled = false;
+    bool mFirstLine = true;
 };

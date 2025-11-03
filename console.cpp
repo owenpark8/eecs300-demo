@@ -8,24 +8,29 @@ Console::Console(QWidget* parent) : QPlainTextEdit(parent) {
 }
 
 void Console::printData(QByteArray const& data) {
-    printTimestampIfEnabled();
-    insertPlainText(data);
-
     QScrollBar* bar = verticalScrollBar();
-    bar->setValue(bar->maximum());
-}
+    bool isAtMaxScroll = (bar->value() == bar->maximum());
 
-void Console::printLine(QString const& line) {
-    printTimestampIfEnabled();
-    insertPlainText(line + '\n');
+    // Print a new line before every line except the first one
+    // (avoids having two trailing new lines since QPlainTextEdit already adds one)
+    if (!mFirstLine) {
+        insertPlainText("\n");
+    } else {
+        mFirstLine = false;
+    }
 
-    QScrollBar* bar = verticalScrollBar();
-    bar->setValue(bar->maximum());
-}
-
-void Console::printTimestampIfEnabled() {
     if (mIsTimestampEnabled) {
         auto const timestamp = QDateTime::currentDateTime().toString("[yyyy-MM-dd HH:mm:ss.zzz] ");
         insertPlainText(timestamp);
     }
+
+    insertPlainText(data.trimmed());
+
+    if (isAtMaxScroll) {
+        bar->setValue(bar->maximum());
+    }
+}
+
+void Console::printLine(QString const& line) {
+    printData(line.toUtf8());
 }
