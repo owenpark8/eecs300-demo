@@ -5,6 +5,7 @@
 #include <QDockWidget>
 #include <QLabel>
 #include <QMessageBox>
+#include <QTimer>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -13,7 +14,7 @@ MainWindow::MainWindow() {
     resize(QDesktopWidget().availableGeometry(this).size() * 0.7);
 
     mSettings = new SettingsDialog(this);
-    connect(mSettings, &SettingsDialog::settingsChanged, this, &MainWindow::openSerialPort, Qt::QueuedConnection);
+    connect(mSettings, &SettingsDialog::applyClicked, this, &MainWindow::settingsApplied, Qt::QueuedConnection);
 
     auto* consoleDock = new QDockWidget(tr("Log"), this);
     consoleDock->setFeatures(QDockWidget::DockWidgetClosable |
@@ -24,12 +25,15 @@ MainWindow::MainWindow() {
     addDockWidget(Qt::BottomDockWidgetArea, consoleDock);
 
     mSerial = new QSerialPort(this);
-    QObject::connect(mSerial, &QSerialPort::readyRead, [&]() {
-        while (mSerial->canReadLine()) {
-            QByteArray line = mSerial->readLine();
-            processLine(line);
-        }
-    });
+    QObject::connect(mSerial, &QSerialPort::readyRead, this, &MainWindow::readData, Qt::QueuedConnection);
+    connect(mSerial, &QSerialPort::errorOccurred, this,
+            [this](QSerialPort::SerialPortError e) {
+                if (e == QSerialPort::NoError) return;
+
+                mConsole->printLine(tr("Serial error: %1").arg(mSerial->errorString()));
+                QMetaObject::invokeMethod(this, [this]() { closeSerialPort(); }, Qt::QueuedConnection);
+            });
+
 
     mCounterLabel = new QLabel("0");
     mCounterValue = 0;
@@ -80,9 +84,7 @@ MainWindow::MainWindow() {
 }
 
 MainWindow::~MainWindow() {
-    delete mSettings;
     delete mCounterLabel;
-    delete mSerial;
 }
 
 void MainWindow::setCounter(std::size_t value) {
@@ -104,24 +106,36 @@ void MainWindow::resetCounter() {
     mDeltaLabel->setText("+0");
 }
 
-void MainWindow::openSerialPort() {
-    if (mSerial->isOpen()) {
-        mSerial->close();
+void MainWindow::settingsApplied() {
+    if (!mSerial->isOpen() || mSettings->settingsChangedOnLastApply()) {
+        openSerialPort();
+    } else {
+        qDebug() << "Settings applied but port is open and settings have not changed. Will not reopen.";
     }
+}
+
+void MainWindow::openSerialPort() {
+    closeSerialPort();
 
     SettingsDialog::Settings const p = mSettings->settings();
+    if (p.name.isEmpty()) {
+        qDebug() << "No port name specified";
+        return;
+    }
     mConsole->setTimestampEnabled(p.isTimestampEnabled);
     mSerial->setPortName(p.name);
     mSerial->setBaudRate(p.baudRate);
-    mSerial->setDataBits(p.dataBits);
-    mSerial->setParity(p.parity);
-    mSerial->setStopBits(p.stopBits);
-    mSerial->setFlowControl(p.flowControl);
+    mSerial->setDataBits(QSerialPort::Data8);
+    mSerial->setParity(QSerialPort::NoParity);
+    mSerial->setStopBits(QSerialPort::OneStop);
+    mSerial->setFlowControl(QSerialPort::NoFlowControl);
     if (mSerial->open(QIODevice::ReadWrite)) {
         mConsole->printLine(tr("Connected to %1").arg(p.name));
+        mSerial->setDataTerminalReady(true);
+        mSerial->setRequestToSend(true);
     } else {
         QMessageBox::critical(this, tr("Error"), mSerial->errorString());
-        mConsole->printLine(tr("Error opening %1, error: %2").arg(p.name).arg(mSerial->errorString()));
+        mConsole->printLine(tr("Open error: %1").arg(mSerial->errorString()));
     }
 }
 
@@ -129,6 +143,18 @@ void MainWindow::closeSerialPort() {
     if (mSerial->isOpen()) {
         mSerial->close();
         mConsole->printLine(tr("Disconnected"));
+    }
+    mRxBuf.clear();
+}
+
+void MainWindow::readData() {
+    mRxBuf.append(mSerial->readAll());
+    for (;;) {
+        int nl = mRxBuf.indexOf('\n');
+        if (nl < 0) break;                     // no full line yet
+        QByteArray line = mRxBuf.left(nl + 1); // include newline
+        mRxBuf.remove(0, nl + 1);
+        processLine(line);
     }
 }
 

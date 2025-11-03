@@ -13,67 +13,8 @@
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
-   <item row="0" column="1">
-    <widget class="QGroupBox" name="parametersBox">
-     <property name="title">
-      <string>Select Parameters</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="baudRateLabel">
-        <property name="text">
-         <string>BaudRate:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="baudRateBox"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="dataBitsLabel">
-        <property name="text">
-         <string>Data bits:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="dataBitsBox"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="parityLabel">
-        <property name="text">
-         <string>Parity:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="parityBox"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="stopBitsLabel">
-        <property name="text">
-         <string>Stop bits:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="stopBitsBox"/>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="flowControlLabel">
-        <property name="text">
-         <string>Flow control:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="flowControlBox"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout_0">
+   <item>
     <widget class="QGroupBox" name="selectBox">
      <property name="title">
       <string>Select Serial Port</string>
@@ -124,10 +65,43 @@
         </property>
        </widget>
       </item>
+      <item row="7" column="0">
+        <layout class="QHBoxLayout" name="baudRateLayout">
+          <item>
+            <widget class="QLabel" name="baudRateLabel">
+              <property name="text">
+                <string>BaudRate:</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QComboBox" name="baudRateBox"/>
+          </item>
+        </layout>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item>
+    <widget class="QGroupBox" name="additionalOptionsGroupBox">
+     <property name="title">
+      <string>Additional options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_1">
+      <item>
+       <widget class="QCheckBox" name="timestampCheckBox">
+        <property name="text">
+         <string>Console timestamp</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -151,25 +125,7 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QGroupBox" name="additionalOptionsGroupBox">
-     <property name="title">
-      <string>Additional options</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QCheckBox" name="timestampCheckBox">
-        <property name="text">
-         <string>Console timestamp</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
+   
   </layout>
  </widget>
  <resources/>

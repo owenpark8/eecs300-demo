@@ -56,6 +56,7 @@ void SettingsDialog::showPortInfo(int idx) {
 }
 
 void SettingsDialog::apply() {
+    emit applyClicked();
     updateSettings();
     hide();
 }
@@ -92,28 +93,6 @@ void SettingsDialog::fillPortsParameters() {
     mUi->baudRateBox->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
     mUi->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
     mUi->baudRateBox->addItem(tr("Custom"));
-
-    mUi->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
-    mUi->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);
-    mUi->dataBitsBox->addItem(QStringLiteral("7"), QSerialPort::Data7);
-    mUi->dataBitsBox->addItem(QStringLiteral("8"), QSerialPort::Data8);
-    mUi->dataBitsBox->setCurrentIndex(3);
-
-    mUi->parityBox->addItem(tr("None"), QSerialPort::NoParity);
-    mUi->parityBox->addItem(tr("Even"), QSerialPort::EvenParity);
-    mUi->parityBox->addItem(tr("Odd"), QSerialPort::OddParity);
-    mUi->parityBox->addItem(tr("Mark"), QSerialPort::MarkParity);
-    mUi->parityBox->addItem(tr("Space"), QSerialPort::SpaceParity);
-
-    mUi->stopBitsBox->addItem(QStringLiteral("1"), QSerialPort::OneStop);
-#ifdef Q_OS_WIN
-    mUi->stopBitsBox->addItem(tr("1.5"), QSerialPort::OneAndHalfStop);
-#endif
-    mUi->stopBitsBox->addItem(QStringLiteral("2"), QSerialPort::TwoStop);
-
-    mUi->flowControlBox->addItem(tr("None"), QSerialPort::NoFlowControl);
-    mUi->flowControlBox->addItem(tr("RTS/CTS"), QSerialPort::HardwareControl);
-    mUi->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
 }
 
 void SettingsDialog::fillPortsInfo() {
@@ -157,37 +136,16 @@ void SettingsDialog::updateSettings() {
     }
     mCurrentSettings.stringBaudRate = QString::number(mCurrentSettings.baudRate);
 
-    auto const dataBitsData = mUi->dataBitsBox->currentData();
-    mCurrentSettings.dataBits = dataBitsData.value<QSerialPort::DataBits>();
-    mCurrentSettings.stringDataBits = mUi->dataBitsBox->currentText();
-
-    auto const parityData = mUi->parityBox->currentData();
-    mCurrentSettings.parity = parityData.value<QSerialPort::Parity>();
-    mCurrentSettings.stringParity = mUi->parityBox->currentText();
-
-    auto const stopBitsData = mUi->stopBitsBox->currentData();
-    mCurrentSettings.stopBits = stopBitsData.value<QSerialPort::StopBits>();
-    mCurrentSettings.stringStopBits = mUi->stopBitsBox->currentText();
-
-    auto const flowControlData = mUi->flowControlBox->currentData();
-    mCurrentSettings.flowControl = flowControlData.value<QSerialPort::FlowControl>();
-    mCurrentSettings.stringFlowControl = mUi->flowControlBox->currentText();
-
     mCurrentSettings.isTimestampEnabled = mUi->timestampCheckBox->isChecked();
 
-    if (old != mCurrentSettings) {
-        emit settingsChanged();
-        logSettings();
-    }
+
+    mSettingsChangedOnLastApply = old != mCurrentSettings;
+    logSettings();
 }
 
 void SettingsDialog::logSettings() const {
     qDebug().noquote() << "=== Serial Port Settings ===";
     qDebug().noquote() << "Port Name:       " << mCurrentSettings.name;
     qDebug().noquote() << "Baud Rate:       " << mCurrentSettings.stringBaudRate;
-    qDebug().noquote() << "Data Bits:       " << mCurrentSettings.stringDataBits;
-    qDebug().noquote() << "Parity:          " << mCurrentSettings.stringParity;
-    qDebug().noquote() << "Stop Bits:       " << mCurrentSettings.stringStopBits;
-    qDebug().noquote() << "Flow Control:    " << mCurrentSettings.stringFlowControl;
     qDebug().noquote() << "============================";
 }

@@ -19,14 +19,6 @@ public:
         QString name;
         qint32 baudRate;
         QString stringBaudRate;
-        QSerialPort::DataBits dataBits;
-        QString stringDataBits;
-        QSerialPort::Parity parity;
-        QString stringParity;
-        QSerialPort::StopBits stopBits;
-        QString stringStopBits;
-        QSerialPort::FlowControl flowControl;
-        QString stringFlowControl;
 
         bool isTimestampEnabled;
 
@@ -37,12 +29,13 @@ public:
     ~SettingsDialog() override;
 
     [[nodiscard]] auto settings() const -> Settings;
+    [[nodiscard]] auto settingsChangedOnLastApply() const -> bool { return mSettingsChangedOnLastApply; }
 
 protected:
     void showEvent(QShowEvent* event) override;
 
 signals:
-    void settingsChanged();
+    void applyClicked();
 
 private slots:
     void showPortInfo(int idx);
@@ -61,4 +54,5 @@ private:
     Ui::SettingsDialog* mUi = nullptr;
     Settings mCurrentSettings{};
     QIntValidator* mIntValidator = nullptr;
+    bool mSettingsChangedOnLastApply = false;
 };

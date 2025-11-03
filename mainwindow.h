@@ -21,8 +21,10 @@ public slots:
     void resetCounter();
 
 private slots:
+    void settingsApplied();
     void openSerialPort();
     void closeSerialPort();
+    void readData();
 
 private:
     void processLine(QByteArray const& line);
@@ -31,6 +33,7 @@ private:
     Console* mConsole;
     SettingsDialog* mSettings;
     QSerialPort* mSerial = nullptr;
+    QByteArray mRxBuf;
     QLabel* mCounterLabel;
     QLabel* mDeltaLabel;
     std::size_t mCounterValue;
