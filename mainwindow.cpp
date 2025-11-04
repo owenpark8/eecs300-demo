@@ -129,18 +129,25 @@ void MainWindow::openSerialPort() {
     mSerial->setParity(QSerialPort::NoParity);
     mSerial->setStopBits(QSerialPort::OneStop);
     mSerial->setFlowControl(QSerialPort::NoFlowControl);
-    if (mSerial->open(QIODevice::ReadWrite)) {
-        mConsole->printLine(tr("Connected to %1").arg(p.name));
-        mSerial->setDataTerminalReady(true);
-        mSerial->setRequestToSend(true);
-    } else {
+    if (!mSerial->open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, tr("Error"), mSerial->errorString());
         mConsole->printLine(tr("Open error: %1").arg(mSerial->errorString()));
     }
+    mConsole->printLine(tr("Connected to %1").arg(p.name));
+
+    QTimer::singleShot(100, this, [this, p]() {
+        mSerial->setBaudRate(p.baudRate);
+        mSerial->setDataBits(QSerialPort::Data8);
+        mSerial->setParity(QSerialPort::NoParity);
+        mSerial->setStopBits(QSerialPort::OneStop);
+        mSerial->setFlowControl(QSerialPort::NoFlowControl);
+        mSerial->setDataTerminalReady(true);
+    });
 }
 
 void MainWindow::closeSerialPort() {
     if (mSerial->isOpen()) {
+        mSerial->setDataTerminalReady(false);
         mSerial->close();
         mConsole->printLine(tr("Disconnected"));
     }
@@ -148,11 +155,23 @@ void MainWindow::closeSerialPort() {
 }
 
 void MainWindow::readData() {
+    if (!mSerial->isOpen()) {
+        qDebug() << "Serial port not open, ignoring read";
+        return;
+    }
+
     mRxBuf.append(mSerial->readAll());
+
+    if (!mRxBuf.isEmpty() && !(mRxBuf[0] == '\n' || mRxBuf[0] == '\r' || (QChar(mRxBuf[0]).isDigit()))) {
+        mConsole->printLine(mRxBuf);
+        mRxBuf.clear();
+        return;
+    }
+
     for (;;) {
         int nl = mRxBuf.indexOf('\n');
-        if (nl < 0) break;                     // no full line yet
-        QByteArray line = mRxBuf.left(nl + 1); // include newline
+        if (nl < 0) break;
+        QByteArray line = mRxBuf.left(nl + 1);
         mRxBuf.remove(0, nl + 1);
         processLine(line);
     }
@@ -165,7 +184,5 @@ void MainWindow::processLine(QByteArray const& line) {
     std::size_t value = line.trimmed().toUInt(&ok);
     if (ok) {
         setCounter(value);
-    } else {
-        mConsole->printLine("Invalid data received");
     }
 }

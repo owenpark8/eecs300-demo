@@ -70,7 +70,7 @@
           <item>
             <widget class="QLabel" name="baudRateLabel">
               <property name="text">
-                <string>BaudRate:</string>
+                <string>Baudrate:</string>
               </property>
             </widget>
           </item>
