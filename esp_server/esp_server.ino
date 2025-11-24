@@ -23,7 +23,7 @@ void setup()
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
   Serial.print("ESP32 IP as soft AP: ");
-  Serial.println(WiFi.softAPIP());
+  Serial.print(WiFi.softAPIP());
   
   server.begin();
 
@@ -31,7 +31,7 @@ void setup()
   esp_task_wdt_init(5, true); //enable watchdog (which will restart ESP32 if it hangs)
   esp_task_wdt_add(NULL); //add current thread to WDT watch
   
-  Serial.println("server started\n");
+  Serial.println("server started");
 
   // Built-in button, active low
   pinMode(BUTTON_PIN, INPUT);
@@ -52,7 +52,6 @@ void loop()
       //note that if the received line starts with '-', '+', or '#', the code will assume we are decrementing, incrementing, or setting the count, respectively
       //recieved lines starting with any other character will be printed to the serial monitor
       //more cases can be added
-      measure_delta_time(line.length());//comment this out if you don't want to see this info printed
       switch(line[0])
       {
         case '-'  : Serial.printf("%u\n", --count);
@@ -84,19 +83,4 @@ void loop()
 void IRAM_ATTR reset_req_TSR()
 {
   resetRequestFlag = 1;
-}
-
-//TODO: modify this function to print max, and min delta times instead of current ones
-//if length is > 0 (in other words. not empty String) calculate dela time and print
-void measure_delta_time(uint32_t len)
-{
-  static uint32_t prevTime = 0;
-  uint32_t currTime = millis();
-  if(len && !isFirstMeasurement && !resetRequestFlag)
-  {
-    uint32_t deltaTime = currTime - prevTime;
-    Serial.printf("Delta time: %u ms\r\n", (uint32_t) deltaTime);
-  }
-  isFirstMeasurement = 0;
-  prevTime = currTime;
 }
