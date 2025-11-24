@@ -38,7 +38,7 @@ MainWindow::MainWindow() {
     mCounterLabel = new QLabel("0");
     mCounterValue = 0;
     QFont font = mCounterLabel->font();
-    font.setPointSize(48);
+    font.setPointSize(128);
     mCounterLabel->setFont(font);
     mCounterLabel->setAlignment(Qt::AlignCenter);
 

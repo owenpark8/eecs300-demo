@@ -84,14 +84,14 @@ void SettingsDialog::onShown() {
 }
 
 void SettingsDialog::fillPortsParameters() {
-    mUi->baudRateBox->addItem(QStringLiteral("1200"), QSerialPort::Baud1200);
-    mUi->baudRateBox->addItem(QStringLiteral("2400"), QSerialPort::Baud2400);
-    mUi->baudRateBox->addItem(QStringLiteral("4800"), QSerialPort::Baud4800);
-    mUi->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
-    mUi->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
-    mUi->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
-    mUi->baudRateBox->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
     mUi->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
+    mUi->baudRateBox->addItem(QStringLiteral("57600"), QSerialPort::Baud57600);
+    mUi->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
+    mUi->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
+    mUi->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
+    mUi->baudRateBox->addItem(QStringLiteral("4800"), QSerialPort::Baud4800);
+    mUi->baudRateBox->addItem(QStringLiteral("2400"), QSerialPort::Baud2400);
+    mUi->baudRateBox->addItem(QStringLiteral("1200"), QSerialPort::Baud1200);
     mUi->baudRateBox->addItem(tr("Custom"));
 }
 

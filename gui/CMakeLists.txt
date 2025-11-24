@@ -10,7 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_executable(eecs300-display
+add_executable(eecs300-demo
     main.cpp
     mainwindow.cpp
     settingsdialog.cpp
@@ -18,7 +18,7 @@ add_executable(eecs300-display
     console.cpp
 )
 
-target_link_libraries(eecs300-display PRIVATE Qt5::Widgets Qt5::SerialPort)
+target_link_libraries(eecs300-demo PRIVATE Qt5::Widgets Qt5::SerialPort)
 
 file(COPY ${CMAKE_SOURCE_DIR}/images
      DESTINATION ${CMAKE_BINARY_DIR})
